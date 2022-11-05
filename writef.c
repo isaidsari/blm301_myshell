@@ -1,47 +1,54 @@
 /**
     * @file writef.c
-    * @brief Write to a file using fprintf
-    * @details Write to a file using fprintf
-    * @version 0.1
-    * @date 2023
-*/
-
-/**
-* @file Dosya adı
-* @description Programınızın açıklaması ne yaptığına dair.
-* @assignment Kaçıncı ödev olduğu
-* @date Kodu oluşturduğunuz Tarih
-* @author yazar adı ve mail adresi
+    * @brief write to a file system time, pid and ppid
+    * @details if the file exists, it will be appended to
+    * @version 0.2
+    * @date 06.11.2022
+    * @author isaidsari
+    * @bug no known bugs
+    * @todo no todos
+    * @warning no warnings
+    * @note no notes
+    * @see no references
+    * @copyright no copyrigths
 */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/wait.h>
 #include <time.h>
+#include <sys/wait.h>
 
 int main(int argc, char *argv[])
 {
-    // file name taken from parent process arguments
-    char *filename = argv[1];
-    // open the file
-    FILE *file = fopen(filename, "w");
+    if (argc != 3)
+    {
+        printf("Usage: %s -f <filename>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    char *filename = argv[2];
+
+    FILE *file = fopen(filename, "a");
     if(file == NULL)
     {
-        fprintf(stderr, "Could not open file %s", filename);
-        return 1;
+        printf("Could not open file %s\n", filename);
+        return EXIT_FAILURE;
     }
-    // write the system clock
-    fprintf(file, "System clock: %ld", time(NULL));
-    // write the pid
-    fprintf(file, "Process ID: %d", getpid());
-    // write the ppid
-    fprintf(file, "Parent process ID: %d", getppid());
-    // close the file
+    
+    size_t size = fprintf(file, "time: %ld, PID: %d, PPID: %d\n", time(NULL), getpid(), getppid());
+    if (size < 0)
+    {
+        printf("Could not write to file %s\n", filename);
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        printf("Wrote %ld bytes to file %s\n", size, filename);
+    }
+
     fclose(file);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
