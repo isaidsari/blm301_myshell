@@ -6,8 +6,8 @@
     * @date 06.11.2022
     * @author isaidsari
     * @bug no known bugs
-    * @todo no todos
-    * @warning no warnings
+    * @warning no known warnings
+    * @todo no known todos
     * @note no notes
     * @see no references
     * @copyright no copyrigths
@@ -16,9 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <time.h>
-#include <sys/wait.h>
+
 
 int main(int argc, char *argv[])
 {

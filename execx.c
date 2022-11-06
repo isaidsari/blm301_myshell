@@ -1,46 +1,97 @@
-// this file runs program x times with fork() and exec() system calls
-// compile with: gcc -o execx execx.c
-// run with: ./execx x
+/**
+* @file execx.c
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
+
 int main(int argc, char *argv[])
 {
-    // check for the correct number of arguments
-    if(argc != 2)
-    {
-        fprintf(stderr, "Usage: ./execx x");
-        return 1;
-    }
-    // convert the argument to an integer
-    int x = atoi(argv[1]);
-    // fork x child processes
-    for(int i = 0; i < x; i++)
-    {
-        pid_t pid = fork();
-        if(pid == 0)
-        {
-            // child process
-            // execute the command
-            char *args[] = {"./hello", NULL};
-            execvp(args[0], args);
-            // if execvp returns, there is an error
-            perror("execvp");
-            exit(1);
-        }
-        else
-        {
-            // parent process
-            // wait for the child process to finish
-            wait(NULL);
-        }
-    }
-    return 0;
+    // usage : execx -t <times> <program> <arguments>
 
+    // check if the number of arguments is correct
+    if (argc < 4)
+    {
+        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    // check if the first argument is -t
+    if (strcmp(argv[1], "-t") != 0)
+    {
+        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    // convert the second argument to an integer
+    int times = atoi(argv[2]);
+
+    // check if the second argument is a positive integer
+    if (times <= 0)
+    {
+        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    // create a new array of strings
+    // the first element is the program name
+    // the last element is NULL
+    char *args[argc - 1];
+    args[0] = argv[3];
+    for (int i = 4; i < argc; i++)
+    {
+        args[i - 2] = argv[i];
+    }
+    args[argc - 2] = NULL;
+
+    // run the program x times
+    for (int i = 0; i < times; i++)
+    {
+        // fork a new process
+        pid_t pid = fork();
+
+        // check if the fork failed
+        if (pid < 0)
+        {
+            printf("Fork failed");
+            return EXIT_FAILURE;
+        }
+
+        // check if we are in the child process
+        if (pid == 0)
+        {
+            // run the program
+            //print the arguments
+            printf("Arguments: ");
+            for (int i = 0; i < argc - 2; i++)
+            {
+                printf("%s ", args[i]);
+            }
+            printf("\n");
+
+            execvp(args[0], args);
+
+            // if execvp returns, it failed
+            printf("Exec failed");
+            return EXIT_FAILURE;
+        }
+
+        // wait for the child process to finish
+        wait(NULL);
+
+        // print the number of the current iteration
+        printf("Iteration %d", i + 1);
+
+        // check if this is the last iteration
+        if (i == times - 1)
+        {
+            printf("program %s finished", args[0]);
+        }
+    }
+
+    return EXIT_SUCCESS;
 }
