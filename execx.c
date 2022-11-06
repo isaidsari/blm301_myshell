@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
     // set child's arguments
     int c_argc = argc - 3;
     char *c_argv[c_argc];
-    memcpy(c_args, argv + 3, sizeof(char *) * c_argc);
+    memcpy(c_argv, argv + 3, sizeof(char *) * c_argc);
+    // add NULL to the end of the arguments
+    c_argv[c_argc] = NULL;
 
     // run the program x times
     for (int i = 0; i < times; i++)
@@ -58,6 +60,15 @@ int main(int argc, char *argv[])
         // check if we are in the child process
         if (pid == 0)
         {
+            // print the child's arguments
+            /*
+            printf("Child's arguments: ");
+            for (int j = 0; j < c_argc; j++)
+            {
+                printf("%s\n", c_argv[j]);
+            }
+            */
+
             // run the program,
             execvp(c_argv[0], c_argv);
 
@@ -65,17 +76,19 @@ int main(int argc, char *argv[])
             printf("Exec failed");
             return EXIT_FAILURE;
         }
-
-        // wait for the child process to finish
-        wait(NULL);
-
-        // print the number of the current iteration
-        printf("Iteration %d", i + 1);
-
-        // check if this is the last iteration
-        if (i == times - 1)
+        else
         {
-            printf("program %s finished", args[0]);
+            // wait for the child process to finish
+            wait(NULL);
+
+            // print the number of the current iteration
+            printf("Iteration %d\n", i + 1);
+
+            // check if this is the last iteration
+            if (i == times - 1)
+            {
+                printf("program %s finished\n", c_argv[0]);
+            }
         }
     }
 

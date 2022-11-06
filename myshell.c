@@ -62,12 +62,21 @@ int main(/*int argc, char *argv[]*/)
             pid_t pid = fork();
             if(pid == 0)
             {
+                // print tokens
+                /*
+                for(int i = 0; tokens[i] != NULL; i++)
+                {
+                    printf("%s\n", tokens[i]);
+                }
+                */
+
+
                 // child process
                 // execute the command
                 execvp(tokens[0], tokens);
                 // if execvp returns, there is an error
                 perror("execvp");
-                exit(1);
+                return EXIT_FAILURE;
             }
             else
             {
