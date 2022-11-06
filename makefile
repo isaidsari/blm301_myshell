@@ -1,16 +1,17 @@
 CC = clang
-CFLAGS = -Wall -Wextra #-Werror -pedantic -O0 -g
+CFLAGS = -Wall -Wextra -Werror -pedantic -O0 -g3 -std=c99
 NAME = myshell
 WRITEC = writef
 EXECX = execx
 
-all: $(NAME) $(WRITEC) $(EXECX) clean run
+all: build clean run
 
 run: $(NAME)
 	clear
-	./$(NAME)
+	@./$(NAME)
 
-#
+build: $(NAME) $(WRITEC) $(EXECX)
+
 
 $(NAME): $(NAME).o 
 	$(CC) $(CFLAGS) -o $(NAME) $(NAME).o 
@@ -21,29 +22,16 @@ $(WRITEC): $(WRITEC).o
 $(EXECX): $(EXECX).o
 	$(CC) $(CFLAGS) -o $(EXECX) $(EXECX).o
 
-#
 
-$(NAME).o: $(NAME).c
+$(NAME).o:
 	$(CC) $(CFLAGS) -c $(NAME).c
 
-$(WRITEC).o: $(WRITEC).c
+$(WRITEC).o:
 	$(CC) $(CFLAGS) -c $(WRITEC).c
 
-$(EXECX).o: $(EXECX).c
+$(EXECX).o:
 	$(CC) $(CFLAGS) -c $(EXECX).c
 
-#
-
-$(NAME).c:
-	$(CC) $(CFLAGS) -o $(NAME) $(NAME).c
-
-$(WRITEC).c:
-	$(CC) $(CFLAGS) -o $(WRITEC) $(WRITEC).c
-
-$(EXECX).c:
-	$(CC) $(CFLAGS) -o $(EXECX) $(EXECX).c
-
-#
 
 clean:
 	rm -f *.o
@@ -51,6 +39,6 @@ clean:
 fclean: clean
 	rm -f $(NAME) $(WRITEC) $(EXECX)
 
-.PHONY: clean fclean
+.PHONY: clean fclean run
 
 # https://makefiletutorial.com/
