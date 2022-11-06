@@ -1,10 +1,13 @@
 CC = clang
-CFLAGS = -Wall -Wextra -Werror -pedantic -O0
+CFLAGS = -Wall -Wextra -Werror -pedantic -O3
 NAME = myshell
 WRITEC = writef
 EXECX = execx
 
 all: build clean run
+
+debug: CFLAGS += -D DEBUG -g
+debug: build clean run
 
 run: $(NAME)
 	clear

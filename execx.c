@@ -11,19 +11,19 @@
 
 int main(int argc, char *argv[])
 {
-    // usage : execx -t <times> <program> <arguments>
+    // usage : execx -t <times> <program> <args>
 
     // check if the number of arguments is correct
     if (argc < 4)
     {
-        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     // check if the first argument is -t
     if (strcmp(argv[1], "-t") != 0)
     {
-        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     // check if the second argument is a positive integer
     if (times <= 0)
     {
-        printf("Usage: %s -t <times> <program> <arguments>\n", argv[0]);
+        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -60,16 +60,17 @@ int main(int argc, char *argv[])
         // check if we are in the child process
         if (pid == 0)
         {
+            #ifdef DEBUG
             // print the child's arguments
-            /*
             printf("Child's arguments: ");
             for (int j = 0; j < c_argc; j++)
             {
-                printf("%s\n", c_argv[j]);
+                printf("%s ", c_argv[j]);
             }
-            */
+            printf("\n");
+            #endif
 
-            // run the program,
+            // run the program
             execvp(c_argv[0], c_argv);
 
             // if execvp returns, it failed
@@ -81,8 +82,10 @@ int main(int argc, char *argv[])
             // wait for the child process to finish
             wait(NULL);
 
+            #ifdef DEBUG
             // print the number of the current iteration
             printf("Iteration %d\n", i + 1);
+            #endif
 
             // check if this is the last iteration
             if (i == times - 1)
@@ -91,6 +94,5 @@ int main(int argc, char *argv[])
             }
         }
     }
-
     return EXIT_SUCCESS;
 }
