@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra -Werror -pedantic -O0 -g3 -std=c99
+CFLAGS = -Wall -Wextra -Werror -pedantic -O0
 NAME = myshell
 WRITEC = writef
 EXECX = execx
@@ -40,5 +40,3 @@ fclean: clean
 	rm -f $(NAME) $(WRITEC) $(EXECX)
 
 .PHONY: clean fclean run
-
-# https://makefiletutorial.com/
