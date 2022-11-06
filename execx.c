@@ -37,16 +37,10 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // create a new array of strings
-    // the first element is the program name
-    // the last element is NULL
-    char *args[argc - 1];
-    args[0] = argv[3];
-    for (int i = 4; i < argc; i++)
-    {
-        args[i - 2] = argv[i];
-    }
-    args[argc - 2] = NULL;
+    // set child's arguments
+    int c_argc = argc - 3;
+    char *c_argv[c_argc];
+    memcpy(c_args, argv + 3, sizeof(char *) * c_argc);
 
     // run the program x times
     for (int i = 0; i < times; i++)
@@ -64,16 +58,8 @@ int main(int argc, char *argv[])
         // check if we are in the child process
         if (pid == 0)
         {
-            // run the program
-            //print the arguments
-            printf("Arguments: ");
-            for (int i = 0; i < argc - 2; i++)
-            {
-                printf("%s ", args[i]);
-            }
-            printf("\n");
-
-            execvp(args[0], args);
+            // run the program,
+            execvp(c_argv[0], c_argv);
 
             // if execvp returns, it failed
             printf("Exec failed");
