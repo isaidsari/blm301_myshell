@@ -15,21 +15,25 @@ int main(/*int argc, char *argv[]*/)
         // print the prompt
         printf("myshell>> ");
         // read the command
-        char command[100];
-        fgets(command, 100, stdin);
-        // remove the newline character
+        char command[256];
+        fgets(command, 256, stdin);
+        // remove the newline character from the end of the command
         command[strlen(command) - 1] = '\0';
+
         // split the command into tokens
-        char *tokens[100];
         char *token = strtok(command, " ");
+        char *tokens[256];
         int i = 0;
-        while(token != NULL)
+        while (token != NULL)
         {
             tokens[i] = token;
             token = strtok(NULL, " ");
             i++;
         }
+        // add NULL to the end of the tokens
         tokens[i] = NULL;
+        
+        
         // execute the command
         if(strcmp(tokens[0], "exit") == 0)
         {
