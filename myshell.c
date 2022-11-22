@@ -21,8 +21,8 @@ int main(/*int argc, char *argv[]*/)
         command[strlen(command) - 1] = '\0';
 
         // split the command into tokens
-        char *token = strtok(command, " ");
         char *tokens[256];
+        char *token = strtok(command, " ");
         int i = 0;
         while (token != NULL)
         {

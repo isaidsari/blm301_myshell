@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     // check if the first argument is -f
     if (strcmp(argv[1], "-f") != 0)
     {
-        printf("Usage: %s -f <filename>\n", argv[0]);
+        printf("Usage: %s -f[!] <filename>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -42,6 +42,14 @@ int main(int argc, char *argv[])
     // if the file does not exist, it will be created
     // if the file exists, it will be appended to
     char *filename = argv[2];
+
+    // check if file name argument is empty
+    if (strlen(filename) == 0)
+    {
+        printf("Usage: %s -f <filename>[!]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
     FILE *file = fopen(filename, "a");
 
     // check if the file was opened successfully
