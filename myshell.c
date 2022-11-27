@@ -24,10 +24,13 @@ int main(void)
     printf("\033[0m");
 #endif
 
-    char command[BUFFER_SIZE];
+    // allocate memory for the buffer
+    // char command[BUFFER_SIZE];
+    char *command = (char *)malloc(BUFFER_SIZE * sizeof(char));
     // max token count is buffer_size / 2
     // because tokens are separated by space
-    char *tokens[BUFFER_SIZE / 2];
+    // char *tokens[BUFFER_SIZE / 2];
+    char **tokens = (char **)malloc((BUFFER_SIZE / 2) * sizeof(char *));
 
     while (true)
     {
@@ -50,6 +53,10 @@ int main(void)
             trimmed_command++;
         }
         strcpy(command, trimmed_command);
+
+#ifdef DEBUG
+        printf("debug: command [%lu] %s\n", strlen(command), command);
+#endif
 
         // check if buffer is empty
         if (strlen(command) == 0)
@@ -141,4 +148,7 @@ int main(void)
             }
         }
     }
+    // free memory resources
+    free(command);
+    free(tokens);
 }
