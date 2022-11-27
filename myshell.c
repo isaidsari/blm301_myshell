@@ -16,7 +16,7 @@
 
 #define BUFFER_SIZE 1024
 
-int main(/*int argc, char *argv[]*/)
+int main(void)
 {
 #ifdef DEBUG
     printf("\033[1;31m");
@@ -24,12 +24,16 @@ int main(/*int argc, char *argv[]*/)
     printf("\033[0m");
 #endif
 
-    while (1)
+    char command[BUFFER_SIZE];
+    // max token count is buffer_size / 2
+    // because tokens are separated by space
+    char *tokens[BUFFER_SIZE / 2];
+
+    while (true)
     {
         // print the prompt
         printf("myshell>> ");
         // read the command
-        char *command = (char *)malloc(BUFFER_SIZE * sizeof(char));
         if (fgets(command, BUFFER_SIZE, stdin) == NULL)
         {
             printf("myshell: error occured while reading command");
@@ -55,7 +59,6 @@ int main(/*int argc, char *argv[]*/)
         }
 
         // split the command into tokens
-        char *tokens[BUFFER_SIZE];
         char *token = strtok(command, " ");
         int i = 0;
         while (token != NULL)
