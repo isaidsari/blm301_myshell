@@ -1,4 +1,10 @@
-// linux shell myshell implementation
+/**
+ * @file myshell.c
+ * @brief linux shell myshell implementation
+ * @version 0.4
+ * @date 05.11.2022-28.11.2022
+ * @author isaidsari
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,50 +14,101 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#define BUFFER_SIZE 1024
+
 int main(/*int argc, char *argv[]*/)
 {
-    while(1)
+#ifdef DEBUG
+    printf("\033[1;31m");
+    printf("debug: debug mode is on\n");
+    printf("\033[0m");
+#endif
+
+    while (1)
     {
         // print the prompt
         printf("myshell>> ");
         // read the command
-        char command[256];
-        fgets(command, 256, stdin);
+        char *command = (char *)malloc(BUFFER_SIZE * sizeof(char));
+        if (fgets(command, BUFFER_SIZE, stdin) == NULL)
+        {
+            printf("myshell: error occured while reading command");
+            return EXIT_FAILURE;
+        }
+
         // remove the newline character from the end of the command
         command[strlen(command) - 1] = '\0';
 
+        // trim spaces from the beginning of the command
+        char *trimmed_command = command;
+        while (*trimmed_command == ' ')
+        {
+            trimmed_command++;
+        }
+        strcpy(command, trimmed_command);
+
+        // check if buffer is empty
+        if (strlen(command) == 0)
+        {
+            printf("myshell: no command provided\n");
+            continue;
+        }
+
         // split the command into tokens
-        char *tokens[256];
+        char *tokens[BUFFER_SIZE];
         char *token = strtok(command, " ");
         int i = 0;
         while (token != NULL)
         {
+
+#ifdef DEBUG
+            printf("debug: token [%d] = '%s'\n", i, token);
+#endif
             tokens[i] = token;
             token = strtok(NULL, " ");
             i++;
         }
         // add NULL to the end of the tokens
         tokens[i] = NULL;
-        
-        
+
+        if (strcmp(tokens[0], "writef") == 0)
+        {
+            tokens[0] = "./writef";
+        }
+        if (strcmp(tokens[0], "execx") == 0)
+        {
+            tokens[0] = "./execx";
+        }
+
         // execute the command
-        if(strcmp(tokens[0], "exit") == 0)
+        if (strcmp(tokens[0], "exit") == 0)
         {
             // exit the shell
-            exit(0);
+            // exit(0);
+            return EXIT_SUCCESS;
+        }
+        else if (strcmp(tokens[0], "help") == 0)
+        {
+            // print help message
+            printf("myshell supports this commands:\n");
+            printf("exit                                   ? exit the shell\n");
+            printf("help                                   ? print this help message\n");
+            printf("execx -t <number of iterations> <args> ? executes args t times\n");
+            printf("writef -f <filename>                   ? writes the time, pid and ppid to file\n");
         }
         else if (strcmp(tokens[0], "bash") == 0)
         {
             // call bash
             pid_t pid = fork();
-            if(pid == 0)
+            if (pid == 0)
             {
                 // child process
                 // execute the command
-                execvp("/bin/bash", tokens);
+                char *bash_argv[] = {"/bin/bash", NULL};
+                execvp("/bin/bash", bash_argv);
                 // if execvp returns, there is an error
                 perror("execvp");
-                exit(1);
+                return EXIT_FAILURE;
             }
             else
             {
@@ -64,17 +121,8 @@ int main(/*int argc, char *argv[]*/)
         {
             // fork a child process
             pid_t pid = fork();
-            if(pid == 0)
+            if (pid == 0)
             {
-                // print tokens
-                /*
-                for(int i = 0; tokens[i] != NULL; i++)
-                {
-                    printf("%s\n", tokens[i]);
-                }
-                */
-
-
                 // child process
                 // execute the command
                 execvp(tokens[0], tokens);

@@ -1,13 +1,17 @@
 /**
-* @file execx.c
-*/
+ * @file execx.c
+ * @brief execute a program -t times
+ * @version 0.7
+ * @date 05.11.2022-28.11.2022
+ * @author isaidsari
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
@@ -16,14 +20,15 @@ int main(int argc, char *argv[])
     // check if the number of arguments is correct
     if (argc < 4)
     {
-        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
+        printf("usage: %s -t <times> <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     // check if the first argument is -t
     if (strcmp(argv[1], "-t") != 0)
     {
-        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
+        // print red error message
+        printf("usage: %s '-t' <times> <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -33,7 +38,7 @@ int main(int argc, char *argv[])
     // check if the second argument is a positive integer
     if (times <= 0)
     {
-        printf("Usage: %s -t <times> <program> <args>\n", argv[0]);
+        printf("usage: %s -t '<times>' <program> <args>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -44,6 +49,18 @@ int main(int argc, char *argv[])
     // add NULL to the end of the arguments
     c_argv[c_argc] = NULL;
 
+    if (strcmp(c_argv[0], "writef") == 0)
+    {
+        c_argv[0] = "./writef";
+    }
+    if (strcmp(c_argv[0], "execx") == 0)
+    {
+        c_argv[0] = "./execx";
+    }
+
+    // calc execution time
+    time_t start = time(NULL);
+
     // run the program x times
     for (int i = 0; i < times; i++)
     {
@@ -53,28 +70,28 @@ int main(int argc, char *argv[])
         // check if the fork failed
         if (pid < 0)
         {
-            printf("Fork failed");
+            printf("fork failed");
             return EXIT_FAILURE;
         }
 
         // check if we are in the child process
         if (pid == 0)
         {
-            #ifdef DEBUG
+#ifdef DEBUG
             // print the child's arguments
-            printf("Child's arguments: ");
+            printf("debug: child's arguments: ");
             for (int j = 0; j < c_argc; j++)
             {
-                printf("%s ", c_argv[j]);
+                printf("{%s} ", c_argv[j]);
             }
             printf("\n");
-            #endif
+#endif
 
             // run the program
             execvp(c_argv[0], c_argv);
 
             // if execvp returns, it failed
-            printf("Exec failed");
+            perror("execvp");
             return EXIT_FAILURE;
         }
         else
@@ -82,17 +99,13 @@ int main(int argc, char *argv[])
             // wait for the child process to finish
             wait(NULL);
 
-            #ifdef DEBUG
+#ifdef DEBUG
             // print the number of the current iteration
-            printf("Iteration %d\n", i + 1);
-            #endif
-
-            // check if this is the last iteration
-            if (i == times - 1)
-            {
-                printf("program %s finished\n", c_argv[0]);
-            }
+            printf("debug: execx iteration %d\n", i + 1);
+#endif
         }
     }
+    printf("program %s finished in %ld secs\n", c_argv[0], time(NULL) - start);
+
     return EXIT_SUCCESS;
 }

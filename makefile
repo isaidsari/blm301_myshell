@@ -1,13 +1,10 @@
-CC = clang
-CFLAGS = -Wall -Wextra -Werror -pedantic -O3
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -pedantic -O0 -std=c99
 NAME = myshell
 WRITEC = writef
 EXECX = execx
 
 all: build clean run
-
-debug: CFLAGS += -D DEBUG -g
-debug: build clean run
 
 run: $(NAME)
 	clear
@@ -15,8 +12,10 @@ run: $(NAME)
 
 build: $(NAME) $(WRITEC) $(EXECX)
 
+debug: CFLAGS += -g -D DEBUG
+debug: all
 
-$(NAME): $(NAME).o 
+$(NAME): $(NAME).o
 	$(CC) $(CFLAGS) -o $(NAME) $(NAME).o 
 
 $(WRITEC): $(WRITEC).o
