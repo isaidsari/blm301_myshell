@@ -1,9 +1,9 @@
 /**
- * @file myshell.c
- * @brief linux shell myshell implementation
+ * @file    myshell.c
+ * @brief   linux shell myshell implementation
  * @version 0.4
- * @date 05.11.2022-28.11.2022
- * @author isaidsari
+ * @date    05.11.2022-28.11.2022
+ * @author  isaidsari
  */
 
 #include <stdio.h>
@@ -62,6 +62,8 @@ int main(void)
         if (strlen(command) == 0)
         {
             printf("myshell: no command provided\n");
+            // skip the rest of the loop
+            // ask for new command
             continue;
         }
 
@@ -70,33 +72,36 @@ int main(void)
         int i = 0;
         while (token != NULL)
         {
-
 #ifdef DEBUG
             printf("debug: token [%d] = '%s'\n", i, token);
 #endif
-            tokens[i] = token;
+            // tokens[i] = token;
+
+            if (strcmp(token, "writef") == 0)
+            {tokens[i] = "./writef";}
+            else if (strcmp(token, "execx") == 0)
+            {tokens[i] = "./execx";}
+            else
+            {tokens[i] = token;}
+            // else if (strcmp(token, "cat") == 0)
+            // {tokens[i] = "/bin/cat";} ...
+
             token = strtok(NULL, " ");
             i++;
         }
         // add NULL to the end of the tokens
         tokens[i] = NULL;
 
-        if (strcmp(tokens[0], "writef") == 0)
-        {
-            tokens[0] = "./writef";
-        }
-        if (strcmp(tokens[0], "execx") == 0)
-        {
-            tokens[0] = "./execx";
-        }
-
         // execute the command
+        // check if the command is 'exit' then break
         if (strcmp(tokens[0], "exit") == 0)
         {
             // exit the shell
             // exit(0);
-            return EXIT_SUCCESS;
+            // return EXIT_SUCCESS;
+            break;
         }
+        // if command is 'help' then display help
         else if (strcmp(tokens[0], "help") == 0)
         {
             // print help message
@@ -106,27 +111,6 @@ int main(void)
             printf("execx -t <number of iterations> <args> ? executes args t times\n");
             printf("writef -f <filename>                   ? writes the time, pid and ppid to file\n");
         }
-        else if (strcmp(tokens[0], "bash") == 0)
-        {
-            // call bash
-            pid_t pid = fork();
-            if (pid == 0)
-            {
-                // child process
-                // execute the command
-                char *bash_argv[] = {"/bin/bash", NULL};
-                execvp("/bin/bash", bash_argv);
-                // if execvp returns, there is an error
-                perror("execvp");
-                return EXIT_FAILURE;
-            }
-            else
-            {
-                // parent process
-                // wait for the child process to finish
-                wait(NULL);
-            }
-        }
         else
         {
             // fork a child process
@@ -135,8 +119,13 @@ int main(void)
             {
                 // child process
                 // execute the command
-                execvp(tokens[0], tokens);
-                // if execvp returns, there is an error
+                if (execvp(tokens[0], tokens) == -1)
+                {
+                    printf("myshell: an error occured while executing command '%s'\n", tokens[0]);
+                    return EXIT_FAILURE;
+                }
+                // execvp(tokens[0], tokens);
+                //  if execvp returns, there is an error
                 perror("execvp");
                 return EXIT_FAILURE;
             }
@@ -151,4 +140,5 @@ int main(void)
     // free memory resources
     free(command);
     free(tokens);
+    return EXIT_SUCCESS;
 }

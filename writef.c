@@ -1,10 +1,10 @@
 /**
- * @file writef.c
- * @brief write to a file system pid, ppid and time
+ * @file    writef.c
+ * @brief   write to a file system pid, ppid and time
  * @details if the file exists, it will be appended to
  * @version 0.4
- * @date 06.11.2022-28.11.2022
- * @author isaidsari
+ * @date    06.11.2022-28.11.2022
+ * @author  isaidsari
  */
 
 #include <stdio.h>
@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 
+// function prototype
 char *get_date(void);
 
 int main(int argc, char *argv[])
@@ -33,9 +34,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // open the file in append mode
-    // if the file does not exist, it will be created
-    // if the file exists, it will be appended to
+    // take file name as argument
     char *filename = argv[2];
 
 #ifdef DEBUG
@@ -49,6 +48,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    // open the file in append mode
+    // if the file does not exist, it will be created
+    // if the file exists, it will be appended to
     FILE *file = fopen(filename, "a");
 
     // check if the file was opened successfully
@@ -60,9 +62,10 @@ int main(int argc, char *argv[])
 
     char *date = get_date();
 
-    // write the time, pid and ppid to the file
+    // write the pid, ppid and date to the file
     int size = fprintf(file, "pid: %d, ppid: %d, time: %lu, date: %s\n", getpid(), getppid(), time(NULL), date);
 
+    // check if the write was successful
     if (size < 0)
     {
         printf("could not write to file %s\n", filename);
@@ -84,10 +87,12 @@ int main(int argc, char *argv[])
 
 char *get_date()
 {
+    // convert time to date and clock string
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
     // "dd/mm/yyyy hh:mm:ss"
     char *date = (char *)malloc(20 * sizeof(char));
+    // format tm struct to date string
     sprintf(date, "%d/%d/%d %d:%d:%d",
             tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec);
 

@@ -1,9 +1,9 @@
 /**
- * @file execx.c
- * @brief execute a program -t times
+ * @file    execx.c
+ * @brief   execute a program -t times
  * @version 0.7
- * @date 05.11.2022-28.11.2022
- * @author isaidsari
+ * @date    05.11.2022-28.11.2022
+ * @author  isaidsari
  */
 
 #include <stdio.h>
@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
     }
 
     // convert the second argument to an integer
+    // not safe, todo replace with safe function
     int times = atoi(argv[2]);
 
     // check if the second argument is a positive integer
@@ -43,20 +44,23 @@ int main(int argc, char *argv[])
     }
 
     // set child's arguments
+    // execx -t times ... child args
     int c_argc = argc - 3;
+    // char **c_argv = argv+3;
     char *c_argv[c_argc];
     memcpy(c_argv, argv + 3, sizeof(char *) * c_argc);
     // add NULL to the end of the arguments
     c_argv[c_argc] = NULL;
 
-    if (strcmp(c_argv[0], "writef") == 0)
+#ifdef DEBUG
+    // print the child's arguments
+    printf("debug: child's arguments: ");
+    for (int j = 0; j < c_argc; j++)
     {
-        c_argv[0] = "./writef";
+        printf("{%s} ", c_argv[j]);
     }
-    if (strcmp(c_argv[0], "execx") == 0)
-    {
-        c_argv[0] = "./execx";
-    }
+    printf("\n");
+#endif
 
     // calc execution time
     time_t start = time(NULL);
@@ -77,16 +81,6 @@ int main(int argc, char *argv[])
         // check if we are in the child process
         if (pid == 0)
         {
-#ifdef DEBUG
-            // print the child's arguments
-            printf("debug: child's arguments: ");
-            for (int j = 0; j < c_argc; j++)
-            {
-                printf("{%s} ", c_argv[j]);
-            }
-            printf("\n");
-#endif
-
             // run the program
             execvp(c_argv[0], c_argv);
 
@@ -105,7 +99,8 @@ int main(int argc, char *argv[])
 #endif
         }
     }
-    printf("program %s finished in %ld secs\n", c_argv[0], time(NULL) - start);
+    // print summary of execution
+    printf("program %s iterated %d times in %ld secs\n", c_argv[0], times, time(NULL) - start);
 
     return EXIT_SUCCESS;
 }
